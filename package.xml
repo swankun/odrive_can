@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>odrive_can_ros</name>
+  <version>0.0.0</version>
+  <description>The odrive_can_ros package</description>
+
+  <author>Wankun Sirichotiyakul</author>
+  <maintainer email="maintainer@todo.com">Wankun Sirichotiyakul</maintainer>
+  <license>"TODO"</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>hardware_interface</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>socketcan_interface</build_depend>
+  <build_export_depend>hardware_interface</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>socketcan_interface</build_export_depend>
+  <exec_depend>hardware_interface</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>socketcan_interface</exec_depend>
+
+  <export>
+  </export>
+</package>
