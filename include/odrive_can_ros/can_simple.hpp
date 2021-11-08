@@ -2,7 +2,10 @@
 #define __CAN_SIMPLE_HPP_
 
 #include <cstdint>
-#include <socketcan_interface/socketcan.h>
+#include <iterator>
+#include <map>
+#include <string>
+
 #include <socketcan_interface/threading.h>
 
 #include <odrive_can_ros/can_helpers.hpp>
@@ -10,6 +13,8 @@
 
 namespace odrive_can_ros
 {
+
+using namespace std::literals::chrono_literals;
 
 struct ODriveAxis
 {
@@ -35,9 +40,9 @@ struct ODriveAxis
 class CANSimple 
 {
 
-typedef ODriveAxis Axis;
 typedef can::DriverInterfaceSharedPtr CanBusDriverPtr;
-
+typedef ODriveAxis Axis;
+typedef std::map<std::string,Axis> AxisMap;
 public:
     enum CanSimpleMessage {
         MSG_CO_NMT_CTRL = 0x000,  // CANOpen NMT Message REC
@@ -70,10 +75,14 @@ public:
         MSG_SET_VEL_GAINS,
         MSG_CO_HEARTBEAT_CMD = 0x700,  // CANOpen NMT Heartbeat  SEND
     };
-
-    // CANSimple(CanBusDriverPtr driver);
+    
+    // CANSimple(const std::string can_device, const std::vector<int>& axes);
+    // CANSimple();
+    ~CANSimple();
+    bool add_axis(const int id, const std::string name);
+    const Axis axis(const std::string name);
     void init(CanBusDriverPtr driver);
-    static void handle_can_message(const can_Message_t& msg, std::vector<Axis>& axes);
+    void handle_can_message(const can_Message_t& msg);
 
     // Get functions (msg.rtr bit must be set)
     bool get_motor_error(const Axis& axis);
@@ -138,6 +147,9 @@ private:
     }
 
     CanBusDriverPtr canbus_;
+    can::FrameListenerConstSharedPtr frame_listener_;
+    AxisMap axes_;
+    bool ready_ = false;
     
 };
 

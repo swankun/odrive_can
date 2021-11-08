@@ -3,23 +3,77 @@
 namespace odrive_can_ros
 {
 
-// CANSimple::CANSimple(CanBusDriverPtr driver)
-//     : canbus_(std::move(driver)) {}
+CANSimple::~CANSimple()
+{
+    if (ready_)
+    {
+        canbus_->shutdown();
+    }
+    canbus_.reset();
+}
+
+bool CANSimple::add_axis(const int id, const std::string name)
+{
+    bool duplicate = false;
+    std::string duplicate_name;
+    std::for_each(axes_.cbegin(), axes_.cend(),
+    [&](const auto &entry) {
+        if (entry.second.node_id == id) {
+            duplicate = true;
+            duplicate_name = entry.first;
+        }
+    });
+    if (duplicate) {
+        fprintf(stdout, "Cannot add axis %s with node ID %d.\n", name.c_str(), id);
+        fprintf(stdout, "The node ID is already occupied %s\n", duplicate_name.c_str());
+        return false;
+    }
+    
+    if (!name.empty())
+    {
+        axes_.insert( std::make_pair(name, Axis((unsigned int)id)) );
+    } else 
+    {
+        axes_.insert( std::make_pair(std::to_string(id), Axis((unsigned int)id)) );
+    }
+    return true;
+}
+
+const CANSimple::Axis CANSimple::axis(const std::string name)
+{
+    return axes_.at(name);
+}
 
 void CANSimple::init(CanBusDriverPtr driver)
 {
     canbus_ = std::move(driver);
+    frame_listener_ = canbus_->createMsgListener( 
+        [this](const can::Frame &f) {
+            if (!f.isValid() || f.is_error)
+                return;
+            can_Message_t rxmsg;
+            rxmsg.id = f.id;
+            rxmsg.isExt = f.is_extended;
+            rxmsg.len = f.dlc;
+            rxmsg.rtr = f.is_rtr;
+            std::copy(std::begin(f.data), std::end(f.data), std::begin(rxmsg.buf));
+            handle_can_message(rxmsg);
+        }
+    );
+    ready_ = true;
 }
 
-void CANSimple::handle_can_message(const can_Message_t& msg, std::vector<Axis>& axes) {
+void CANSimple::handle_can_message(const can_Message_t& msg) {
     //     Frame
     // nodeID | CMD
     // 6 bits | 5 bits
+    if (!ready_) { return; }
     uint32_t nodeID = get_node_id(msg.id);
-
-    for (auto& axis : axes) {
-        if ((axis.node_id == nodeID) && (axis.is_extended == msg.isExt)) {
-            do_command(axis, msg);
+    AxisMap::iterator itr;
+    for (itr = axes_.begin(); itr != axes_.end(); ++itr) 
+    {
+        if ((itr->second.node_id == nodeID) && (itr->second.is_extended == msg.isExt)) {
+            do_command(itr->second, msg);
             return;
         }
     }
@@ -61,6 +115,7 @@ void CANSimple::do_command(Axis& axis, const can_Message_t& msg) {
 }
 
 bool CANSimple::send_message(const can_Message_t& msg) {
+    if (!ready_) { return false; }
     can::Frame f;
     f.id = msg.id;
     f.is_extended = msg.isExt;
@@ -72,11 +127,12 @@ bool CANSimple::send_message(const can_Message_t& msg) {
 
 bool CANSimple::send_message(const Axis& axis, const CanSimpleMessage type, const bool rtr)
 {
+    if (!ready_) { return false; }
     can::Frame f;
     f.id = axis.node_id << NUM_CMD_ID_BITS;
     f.id += type; 
     f.is_extended = axis.is_extended;
-    f.dlc = 8;
+    f.dlc = 1;
     f.is_rtr = rtr;
     return canbus_->send(f);
 }
