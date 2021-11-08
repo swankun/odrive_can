@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     // Background worker thread
     std::thread thr( [&master]() {
-        while(1) {
+        while(master.is_ready()) {
             master.get_motor_error(master.axis("odrive_axis_1"));
             master.get_motor_error(master.axis("odrive_axis_2"));
             fprintf(stdout, 

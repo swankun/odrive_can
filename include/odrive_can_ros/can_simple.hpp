@@ -50,7 +50,7 @@ public:
     bool add_axis(const int id, const std::string name);
     const Axis axis(const std::string name);
     void init(CanBusDriverPtr driver);
-    void handle_can_message(const can_Message_t& msg);
+    bool is_ready();
 
     // Get functions (msg.rtr bit must be set)
     bool get_motor_error(const Axis& axis);
@@ -117,7 +117,8 @@ private:
         MSG_SET_VEL_GAINS,
         MSG_CO_HEARTBEAT_CMD = 0x700,  // CANOpen NMT Heartbeat  SEND
     };
-    
+
+    void handle_can_message(const can_Message_t& msg);    
     static void do_command(Axis& axis, const can_Message_t& cmd);
 
     bool send_message(const can_Message_t& msg);

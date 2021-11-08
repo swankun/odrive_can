@@ -7,6 +7,7 @@ CANSimple::~CANSimple()
 {
     if (ready_)
     {
+        ready_ = false;
         canbus_->shutdown();
     }
     canbus_.reset();
@@ -54,6 +55,11 @@ void CANSimple::init(CanBusDriverPtr driver)
         }
     );
     ready_ = true;
+}
+
+bool CANSimple::is_ready()
+{
+    return ready_;
 }
 
 void CANSimple::handle_can_message(const can_Message_t& msg) {
