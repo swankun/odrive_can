@@ -14,18 +14,11 @@ CANSimple::~CANSimple()
 
 bool CANSimple::add_axis(const int id, const std::string name)
 {
-    bool duplicate = false;
-    std::string duplicate_name;
-    std::for_each(axes_.cbegin(), axes_.cend(),
-    [&](const auto &entry) {
-        if (entry.second.node_id == id) {
-            duplicate = true;
-            duplicate_name = entry.first;
-        }
-    });
-    if (duplicate) {
+    auto it = std::find_if(axes_.cbegin(), axes_.cend(),
+        [&id](const auto &entry) { return entry.second.node_id == id; });
+    if (it != axes_.cend()) {
         fprintf(stdout, "Cannot add axis %s with node ID %d.\n", name.c_str(), id);
-        fprintf(stdout, "The node ID is already occupied %s\n", duplicate_name.c_str());
+        fprintf(stdout, "The node ID is already occupied by %s.\n", it->first.c_str());
         return false;
     }
     
