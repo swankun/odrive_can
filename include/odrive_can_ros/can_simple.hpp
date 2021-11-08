@@ -43,39 +43,7 @@ class CANSimple
 typedef can::DriverInterfaceSharedPtr CanBusDriverPtr;
 typedef ODriveAxis Axis;
 typedef std::map<std::string,Axis> AxisMap;
-public:
-    enum CanSimpleMessage {
-        MSG_CO_NMT_CTRL = 0x000,  // CANOpen NMT Message REC
-        MSG_ODRIVE_HEARTBEAT,
-        MSG_ODRIVE_ESTOP,
-        MSG_GET_MOTOR_ERROR,  // Errors
-        MSG_GET_ENCODER_ERROR,
-        MSG_GET_SENSORLESS_ERROR,
-        MSG_SET_AXIS_NODE_ID,
-        MSG_SET_AXIS_REQUESTED_STATE,
-        MSG_SET_AXIS_STARTUP_CONFIG,
-        MSG_GET_ENCODER_ESTIMATES,
-        MSG_GET_ENCODER_COUNT,
-        MSG_SET_CONTROLLER_MODES,
-        MSG_SET_INPUT_POS,
-        MSG_SET_INPUT_VEL,
-        MSG_SET_INPUT_TORQUE,
-        MSG_SET_LIMITS,
-        MSG_START_ANTICOGGING,
-        MSG_SET_TRAJ_VEL_LIMIT,
-        MSG_SET_TRAJ_ACCEL_LIMITS,
-        MSG_SET_TRAJ_INERTIA,
-        MSG_GET_IQ,
-        MSG_GET_SENSORLESS_ESTIMATES,
-        MSG_RESET_ODRIVE,
-        MSG_GET_VBUS_VOLTAGE,
-        MSG_CLEAR_ERRORS,
-        MSG_SET_LINEAR_COUNT,
-        MSG_SET_POS_GAIN,
-        MSG_SET_VEL_GAINS,
-        MSG_CO_HEARTBEAT_CMD = 0x700,  // CANOpen NMT Heartbeat  SEND
-    };
-    
+public:   
     // CANSimple(const std::string can_device, const std::vector<int>& axes);
     // CANSimple();
     ~CANSimple();
@@ -118,6 +86,38 @@ public:
     bool reset_odrive(const Axis& axis);
 
 private:
+    enum CanSimpleMessage {
+        MSG_CO_NMT_CTRL = 0x000,  // CANOpen NMT Message REC
+        MSG_ODRIVE_HEARTBEAT,
+        MSG_ODRIVE_ESTOP,
+        MSG_GET_MOTOR_ERROR,  // Errors
+        MSG_GET_ENCODER_ERROR,
+        MSG_GET_SENSORLESS_ERROR,
+        MSG_SET_AXIS_NODE_ID,
+        MSG_SET_AXIS_REQUESTED_STATE,
+        MSG_SET_AXIS_STARTUP_CONFIG,
+        MSG_GET_ENCODER_ESTIMATES,
+        MSG_GET_ENCODER_COUNT,
+        MSG_SET_CONTROLLER_MODES,
+        MSG_SET_INPUT_POS,
+        MSG_SET_INPUT_VEL,
+        MSG_SET_INPUT_TORQUE,
+        MSG_SET_LIMITS,
+        MSG_START_ANTICOGGING,
+        MSG_SET_TRAJ_VEL_LIMIT,
+        MSG_SET_TRAJ_ACCEL_LIMITS,
+        MSG_SET_TRAJ_INERTIA,
+        MSG_GET_IQ,
+        MSG_GET_SENSORLESS_ESTIMATES,
+        MSG_RESET_ODRIVE,
+        MSG_GET_VBUS_VOLTAGE,
+        MSG_CLEAR_ERRORS,
+        MSG_SET_LINEAR_COUNT,
+        MSG_SET_POS_GAIN,
+        MSG_SET_VEL_GAINS,
+        MSG_CO_HEARTBEAT_CMD = 0x700,  // CANOpen NMT Heartbeat  SEND
+    };
+    
     static void do_command(Axis& axis, const can_Message_t& cmd);
 
     bool send_message(const can_Message_t& msg);

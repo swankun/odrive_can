@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     // Create CAN master node 
     CANSimple master;
     if ( !( master.add_axis(1, "odrive_axis_1") &&
-            master.add_axis(1, "odrive_axis_2") ) )
+            master.add_axis(2, "odrive_axis_2") ) )
     {
         fprintf(stderr, "Failed to create one or more axis. Aborting.\n");
         return -1;
